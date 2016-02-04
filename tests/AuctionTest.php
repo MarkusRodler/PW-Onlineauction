@@ -5,6 +5,7 @@ namespace Dark\PW\Onlineauction;
 
 /**
  * @covers \Dark\PW\Onlineauction\Auction
+ * @uses \Dark\PW\Onlineauction\User
  */
 class AuctionTest extends \PHPUnit_Framework_TestCase
 {
@@ -14,7 +15,8 @@ class AuctionTest extends \PHPUnit_Framework_TestCase
      */
     public function testNameCanNotBeEmpty()
     {
-        new Auction('', 'Beschreibung', 1, new \DateTime('1.1.2037'), new \DateTime('1.1.2037'));
+        $creator = new User('DarkCreator', 'creator@test.de');
+        new Auction($creator, '', 'Beschreibung', 1, new \DateTime('1.1.2037'), new \DateTime('1.1.2037'));
     }
 
     /**
@@ -23,7 +25,8 @@ class AuctionTest extends \PHPUnit_Framework_TestCase
      */
     public function testDescriptionCanNotBeEmpty()
     {
-        new Auction('Auktionsname', '', 1, new \DateTime('1.1.2037'), new \DateTime('1.1.2037'));
+        $creator = new User('DarkCreator', 'creator@test.de');
+        new Auction($creator, 'Auktionsname', '', 1, new \DateTime('1.1.2037'), new \DateTime('1.1.2037'));
     }
 
     /**
@@ -32,12 +35,13 @@ class AuctionTest extends \PHPUnit_Framework_TestCase
      */
     public function testStartPriceMustBePositive()
     {
-        new Auction('Auktionsname', 'Description', -1, new \DateTime('1.1.2037'), new \DateTime('1.1.2037'));
+        $creator = new User('DarkCreator', 'creator@test.de');
+        new Auction($creator, 'Auktionsname', 'Description', -1, new \DateTime('1.1.2037'), new \DateTime('1.1.2037'));
     }
 
     /**
-     * @expectedException InvalidArgumentException
-     * @expectedExceptionMessage Starttime must be in the future
+     * expectedException InvalidArgumentException
+     * expectedExceptionMessage Starttime must be in the future
      */
 //    public function testStarttimeMustBeInTheFuture()
 //    {
@@ -45,12 +49,56 @@ class AuctionTest extends \PHPUnit_Framework_TestCase
 //    }
 
     /**
-     * @expectedException InvalidArgumentException
-     * @expectedExceptionMessage Endtime must be in the future
+     * expectedException InvalidArgumentException
+     * expectedExceptionMessage Endtime must be in the future
      */
 //    public function testEndtimeMustBeInTheFuture()
 //    {
 //        new Auction('Auktionsname', 'Description', 0, new \DateTime('1.1.2037'), new \DateTime('1.1.2000'));
 //    }
 
+    public function testUserCanBid()
+    {
+        $user = new User('Dark', 'test@test.de');
+        $creator = new User('DarkCreator', 'creator@test.de');
+        $auction = new Auction($creator, 'Auktionsname', 'Description', 0, new \DateTime('1.1.2037'), new \DateTime('1.1.2000'));
+        $auction->bid($user, 1);
+    }
+
+    /**
+     * @expectedException InvalidArgumentException
+     * @expectedExceptionMessage Bid cannot be below current bidprice
+     */
+    public function testBidCanNotBeBelowCurrentBidprice()
+    {
+        $user = new User('Dark', 'test@test.de');
+        $creator = new User('DarkCreator', 'creator@test.de');
+        $auction = new Auction($creator, 'Auktionsname', 'Description', 0, new \DateTime('1.1.2037'), new \DateTime('1.1.2000'));
+        $auction->bid($user, 2);
+        $auction->bid($user, 1);
+    }
+
+    /**
+     * @expectedException InvalidArgumentException
+     * @expectedExceptionMessage Bid cannot be below current bidprice
+     */
+    public function testBidCanNotBeEqualToCurrentBidprice()
+    {
+        $user = new User('Dark', 'test@test.de');
+        $creator = new User('DarkCreator', 'creator@test.de');
+        $auction = new Auction($creator, 'Auktionsname', 'Desc', 0, new \DateTime('1.1.2037'), new \DateTime('1.1.2037'));
+        $auction->bid($user, 1);
+        $auction->bid($user, 1);
+    }
+
+    /**
+     * @expectedException InvalidArgumentException
+     * @expectedExceptionMessage Creator cannot bid on his auction
+     */
+    public function testCreatorCanNotBidOnHisAuction()
+    {
+        $creator = new User('DarkCreator', 'creator@test.de');
+        $auction = new Auction($creator, 'Auktionsname', 'Desc', 0, new \DateTime('1.1.2037'), new \DateTime('1.1.2037'));
+        $auction->bid($creator, 1);
+    }
 }

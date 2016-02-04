@@ -6,6 +6,11 @@ namespace Dark\PW\Onlineauction;
 class Auction
 {
     /**
+     * @var User
+     */
+    private $creator;
+    
+    /**
      * @var string
      */
     private $name;
@@ -31,13 +36,23 @@ class Auction
     private $endtime;
 
     /**
+     * @var User
+     */
+    private $bidder;
+
+    /**
+     * @var int
+     */
+    private $bidprice;
+
+    /**
      * @param string $name
      * @param string $description
      * @param integer $startPrice
      * @param \DateTime $starttime
      * @param \DateTime $endtime
      */
-    public function __construct(string $name, string $description, int $startPrice, \DateTime $starttime, \DateTime $endtime)
+    public function __construct(User $creator, string $name, string $description, int $startPrice, \DateTime $starttime, \DateTime $endtime)
     {
         $this->ensureNameIsNotEmpty($name);
         $this->ensureDescriptionIsNotEmpty($description);
@@ -45,6 +60,7 @@ class Auction
         $this->ensureStarttimeIsInTheFuture($starttime);
         $this->ensureEndtimeIsInTheFuture($endtime);
 
+        $this->creator = $creator;
         $this->name = $name;
         $this->description = $description;
         $this->startPrice = $startPrice;
@@ -86,7 +102,7 @@ class Auction
      * @param \DateTime $starttime
      */
     private function ensureStarttimeIsInTheFuture(\DateTime $starttime)
-    {
+    {        
 //        if ($starttime) {
 //            throw new \InvalidArgumentException('Starttime must be in the future');
 //        }
@@ -98,5 +114,32 @@ class Auction
     private function ensureEndtimeIsInTheFuture(\DateTime $endtime)
     {
 //        throw new \InvalidArgumentException('Endtime must be in the future');
+    }
+
+    /**
+     * @param User $user
+     * @param int $bidprice
+     */
+    public function bid(User $user, int $bidprice)
+    {
+        $this->ensureBidIsNotBelowCurrentBidprice($bidprice);
+        $this->ensureBidderIsNotTheCreator($user);
+
+        $this->bidder = $user;
+        $this->bidprice = $bidprice;
+    }
+
+    private function ensureBidIsNotBelowCurrentBidprice(int $bidprice)
+    {
+        if ($bidprice <= $this->bidprice) {
+            throw new \InvalidArgumentException('Bid cannot be below current bidprice');
+        }
+    }
+
+    private function ensureBidderIsNotTheCreator(User $user)
+    {
+        if ($user === $this->creator) {
+            throw new \InvalidArgumentException('Creator cannot bid on his auction');
+        }
     }
 }
