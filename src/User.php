@@ -16,14 +16,6 @@ class User
     private $email;
 
     /**
-     * @return string
-     */
-    public function getEmail() : string
-    {
-        return $this->email;
-    }
-
-    /**
      * @todo: Email abändern in Typ Email anstatt string
      * @param string $name
      * @param string $email
@@ -34,6 +26,22 @@ class User
         $this->ensureEmailIsValid($email);
         $this->name = $name;
         $this->email = $email;
+    }
+    
+    /**
+     * @return string
+     */
+    public function getName() : string
+    {
+        return $this->name;
+    }
+    
+    /**
+     * @return string
+     */
+    public function getEmail() : string
+    {
+        return $this->email;
     }
 
     /**

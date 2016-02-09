@@ -128,7 +128,24 @@ class Auction
         $this->bidder = $user;
         $this->bidprice = $bidprice;
     }
+    
+    /**
+     * @return User
+     */
+    function getBidder(): User
+    {
+        return $this->bidder;
+    }
 
+    /**
+     * @return int
+     */
+    function getBidprice(): int
+    {
+        return $this->bidprice;
+    }
+
+    
     private function ensureBidIsNotBelowCurrentBidprice(int $bidprice)
     {
         if ($bidprice <= $this->bidprice) {

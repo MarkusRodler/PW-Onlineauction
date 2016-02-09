@@ -63,6 +63,9 @@ class AuctionTest extends \PHPUnit_Framework_TestCase
         $creator = new User('DarkCreator', 'creator@test.de');
         $auction = new Auction($creator, 'Auktionsname', 'Description', 0, new \DateTime('1.1.2037'), new \DateTime('1.1.2000'));
         $auction->bid($user, 1);
+        
+        $this->assertSame($user, $auction->getBidder());
+        $this->assertSame(1, $auction->getBidprice());
     }
 
     /**

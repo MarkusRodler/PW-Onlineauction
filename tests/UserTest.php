@@ -25,4 +25,16 @@ class UserTest extends \PHPUnit_Framework_TestCase
     {
         new User('Dark', '');
     }
+    
+    public function testHasName()
+    {
+        $user = new User('Dark', 'test@test.de');
+        $this->assertSame('Dark', $user->getName());
+    }
+    
+    public function testHasEmail()
+    {
+        $user = new User('Dark', 'test@test.de');
+        $this->assertSame('test@test.de', $user->getEmail());
+    }
 }
